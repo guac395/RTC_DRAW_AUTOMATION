@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<team_handicap_calculator>
+    <meta>
+        <source>https://www.irtpa.com/doubles-handicap-calculator/</source>
+        <description>Logic for calculating the Real Tennis handicap for a single doubles pair.</description>
+        <version>1.1</version>
+    </meta>
+
+    <algorithm>
+        <step sequence="1" name="Determine Individual Handicaps">
+            Identify the individual handicap of Player A and Player B.
+        </step>
+        <step sequence="2" name="Calculate Handicap Difference">
+            Calculate the absolute difference between Player A and Player B's handicaps.
+        </step>
+        <step sequence="3" name="Lookup Adjustment Factor">
+            Find the 'Adjustment Factor' in the lookup_table corresponding to the Calculated Handicap Difference.
+        </step>
+        <step sequence="4" name="Calculate Team Handicap">
+            Add the 'Adjustment Factor' to the handicap of the *better* player (the player with the lower numerical handicap).
+            <note>Do not round this number yet; specific match rounding happens after comparing two teams.</note>
+        </step>
+    </algorithm>
+
+    <lookup_table>
+        <entry difference="1" adjustment="0.5" />
+        <entry difference="2" adjustment="1.0" />
+        <entry difference="3" adjustment="1.4" />
+        <entry difference="4" adjustment="1.8" />
+        <entry difference="5" adjustment="2.1" />
+        <entry difference="6" adjustment="2.4" />
+        <entry difference="7" adjustment="2.6" />
+        <entry difference="8" adjustment="2.8" />
+        <entry difference="9" adjustment="3.0" />
+        <entry difference="10" adjustment="3.2" />
+        <entry difference="11" adjustment="3.4" />
+        <entry difference="12" adjustment="3.6" />
+        <entry difference="13" adjustment="3.8" />
+        <entry difference="14" adjustment="4.0" />
+        <entry difference="15" adjustment="4.2" />
+        <entry difference="16" adjustment="4.4" />
+        <entry difference="17" adjustment="4.6" />
+        <entry difference="18" adjustment="4.8" />
+        <entry difference="19" adjustment="5.0" />
+        <entry difference="20" adjustment="5.2" />
+        <entry difference="21" adjustment="5.4" />
+        <entry difference="22" adjustment="5.6" />
+        <entry difference="23" adjustment="5.8" />
+        <entry difference="24" adjustment="6.0" />
+        <entry difference="25" adjustment="6.2" />
+        <entry difference="26" adjustment="6.4" />
+        <entry difference="27" adjustment="6.6" />
+        <entry difference="28" adjustment="6.8" />
+        <entry difference="29" adjustment="7.0" />
+        <entry difference="30" adjustment="7.2" />
+        <entry difference="31" adjustment="7.4" />
+        <entry difference="32" adjustment="7.6" />
+        <entry difference="33" adjustment="7.8" />
+        <entry difference="34" adjustment="8.0" />
+        <entry difference="35" adjustment="8.2" />
+        <entry difference="36" adjustment="8.4" />
+        <entry difference="37" adjustment="8.6" />
+        <entry difference="38" adjustment="8.8" />
+        <entry difference="39" adjustment="9.0" />
+        <entry difference="40" adjustment="9.2" />
+        <entry difference="41" adjustment="9.4" />
+        <entry difference="42" adjustment="9.6" />
+        <entry difference="43" adjustment="9.8" />
+        <entry difference="44" adjustment="10.0" />
+        <entry difference="45" adjustment="10.2" />
+        <entry difference="46" adjustment="10.4" />
+        <entry difference="47" adjustment="10.6" />
+        <entry difference="48" adjustment="10.8" />
+        <entry difference="49" adjustment="10.9" />
+        <entry difference="50" adjustment="11.0" />
+        <entry difference="51" adjustment="11.1" />
+        <entry difference="52" adjustment="11.2" />
+        <entry difference="53" adjustment="11.3" />
+        <entry difference="54" adjustment="11.4" />
+        <entry difference="55" adjustment="11.5" />
+        <entry difference="56" adjustment="11.6" />
+        <entry difference="57" adjustment="11.7" />
+        <entry difference="58" adjustment="11.8" />
+        <entry difference="59" adjustment="11.9" />
+        <entry difference="60" adjustment="12.0" />
+    </lookup_table>
+
+    <validation_example>
+        <description>Calculating the Team Handicap for a pair with 32 and 45 individual handicaps.</description>
+        <player_A>32</player_A>
+        <player_B>45</player_B>
+        <step_2_difference>13</step_2_difference>
+        <step_3_adjustment>3.8</step_3_adjustment>
+        <better_player_handicap>32</better_player_handicap>
+        <step_4_calculation>32 + 3.8</step_4_calculation>
+        <final_team_handicap>35.8</final_team_handicap>
+    </validation_example>

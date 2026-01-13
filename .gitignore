@@ -1,0 +1,87 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build output
+dist/
+
+# macOS
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.nova/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# UXP Developer Tool
+.uxp-developer-tool/
+
+# Environment & Configuration Files
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+*.env
+
+# API Keys, Secrets, and Credentials
+secrets.json
+secrets.yaml
+*secret*
+credentials.json
+token.json
+client_secret*.json
+*.credentials
+
+# Private Keys and Certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+
+# Cloud Provider Credentials
+.aws/
+.gcp/
+service-account*.json
+gcp-*.json
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+
+# OAuth Token Storage
+oauth-tokens/
+*-tokens.json
+
+# Temporary & backup files
+*.tmp
+*.bak
+*~
+.cache/

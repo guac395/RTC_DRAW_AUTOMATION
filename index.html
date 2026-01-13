@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>R&TC Tournament Matcher</title>
+    <link rel="stylesheet" href="styles/panel.css">
+</head>
+<body>
+    <sp-theme theme="spectrum" color="lightest" scale="medium">
+    <div id="app">
+        <!-- Header -->
+        <header class="panel-header">
+            <h1>Tournament Matcher</h1>
+        </header>
+
+        <!-- Main Content -->
+        <main class="panel-content">
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-header">
+                    <h3 id="screen-title">Connection</h3>
+                    <span id="progress-text">Step 1 of 3</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <!-- Screen 1: Connection -->
+            <section id="connection-section" class="section screen" data-screen="1">
+                <h2>Data Connection</h2>
+                <div class="connection-status" id="connection-status">
+                    <span class="status-indicator" id="status-indicator"></span>
+                    <span id="status-text">Not Connected</span>
+                </div>
+
+                <sp-button id="btn-connect" variant="cta" size="m">Connect to Google Sheets</sp-button>
+
+                <div id="auth-code-container" class="hidden">
+                    <p class="auth-instructions">After authorizing in your browser, paste the authorization code below:</p>
+                    <div class="form-group">
+                        <label for="input-auth-code">Authorization Code:</label>
+                        <input type="text" id="input-auth-code" class="select-field" placeholder="Paste code from browser">
+                    </div>
+                    <sp-button id="btn-submit-auth" variant="primary" size="m" disabled>Complete Connection</sp-button>
+                </div>
+            </section>
+
+            <!-- Screen 2: Event Selection -->
+            <section id="event-selection-section" class="section screen hidden" data-screen="2">
+                <h2>Event Selection</h2>
+
+                <div class="form-group">
+                    <sp-picker label="Select Sport Workbook..." id="select-event-workbook">
+                        <!-- Menu items dynamically populated by JavaScript -->
+                    </sp-picker>
+                </div>
+
+                <div class="form-group">
+                    <sp-picker label="Select Event Tab..." id="select-event-tab" disabled>
+                        <!-- Menu items dynamically populated by JavaScript -->
+                    </sp-picker>
+                </div>
+
+                <sp-button id="btn-load-entries" variant="cta" size="m" disabled>Load Entries</sp-button>
+            </section>
+
+            <!-- Screen 3: Participants -->
+            <section id="participants-section" class="section screen hidden" data-screen="3">
+                <h2>Participants (<span id="participant-count">0</span>)</h2>
+
+                <div id="validation-warnings" class="warnings-box hidden"></div>
+
+                <div class="participants-list" id="participants-list">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <div class="action-buttons">
+                    <sp-button id="btn-generate" variant="cta" size="m">Generate in Document</sp-button>
+                </div>
+            </section>
+
+            <!-- Loading Overlay -->
+            <div id="loading-overlay" class="loading-overlay hidden">
+                <div class="spinner"></div>
+                <p id="loading-text">Loading...</p>
+            </div>
+        </main>
+
+        <!-- Navigation Controls (Fixed at bottom, outside main) -->
+        <div class="navigation-controls">
+            <sp-action-button id="nav-btn-back" quiet disabled>
+                <span class="nav-arrow">←</span>
+                <span id="nav-back-text">Back</span>
+            </sp-action-button>
+            <sp-action-button id="nav-btn-forward" quiet>
+                <span id="nav-forward-text">Next</span>
+                <span class="nav-arrow">→</span>
+            </sp-action-button>
+        </div>
+
+        <!-- Footer -->
+        <footer class="panel-footer">
+            <div id="error-message" class="error-message hidden"></div>
+            <div id="success-message" class="success-message hidden"></div>
+        </footer>
+    </div>
+    </sp-theme>
+
+    <script>
+        console.log('HTML loaded - inline script running');
+        console.log('document.readyState:', document.readyState);
+
+        // Add error handler for script loading
+        window.addEventListener('error', (e) => {
+            console.error('Script error:', e.message, e.filename, e.lineno, e.colno);
+        });
+
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled promise rejection:', e.reason);
+        });
+    </script>
+    <script src="bundle.js"></script>
+</body>
+</html>

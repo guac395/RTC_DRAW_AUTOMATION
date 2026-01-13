@@ -1,0 +1,81 @@
+{
+  "manifestVersion": 5,
+  "id": "com.rtc.tournament-matcher",
+  "name": "R&TC Tournament Matcher",
+  "version": "1.0.0",
+  "main": "index.html",
+  "enableSWCSupport": true,
+  "host": {
+    "app": "ID",
+    "minVersion": "18.5"
+  },
+  "entrypoints": [
+    {
+      "type": "panel",
+      "id": "main",
+      "label": {
+        "default": "Tournament Matcher"
+      },
+      "minimumSize": {
+        "width": 400,
+        "height": 600
+      },
+      "maximumSize": {
+        "width": 800,
+        "height": 1200
+      },
+      "preferredDockedSize": {
+        "width": 450,
+        "height": 700
+      },
+      "preferredFloatingSize": {
+        "width": 500,
+        "height": 750
+      }
+    }
+  ],
+  "icons": [
+    {
+      "width": 23,
+      "height": 23,
+      "path": "icons/dark.png",
+      "scale": [
+        1,
+        2
+      ],
+      "theme": [
+        "dark",
+        "darkest"
+      ]
+    },
+    {
+      "width": 23,
+      "height": 23,
+      "path": "icons/light.png",
+      "scale": [
+        1,
+        2
+      ],
+      "theme": [
+        "lightest",
+        "light"
+      ]
+    }
+  ],
+  "requiredPermissions": {
+    "network": {
+      "domains": [
+        "https://sheets.googleapis.com",
+        "https://www.googleapis.com",
+        "https://accounts.google.com",
+        "https://oauth2.googleapis.com"
+      ]
+    },
+    "launchProcess": {
+      "schemes": [
+        "https"
+      ]
+    },
+    "localFileSystem": "fullAccess"
+  }
+}
