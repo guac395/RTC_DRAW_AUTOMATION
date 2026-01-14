@@ -76,16 +76,17 @@ function populatePickerWithItems(picker, items, clickHandler) {
     // Clear existing children
     clearPickerChildren(picker);
 
-    // Add all items with click handlers
+    // Add dynamic items with click handlers
     items.forEach((item) => {
         const menuItem = document.createElement('sp-menu-item');
         menuItem.value = item.value;
         menuItem.textContent = item.text;
 
-        // Attach click handler directly to menu item for reliable selection
         if (clickHandler) {
             menuItem.addEventListener('click', () => {
                 console.log(`Menu item clicked: ${item.value} in picker ${picker.id}`);
+                picker.value = item.value;
+                picker.label = item.text;  // Update displayed label in UXP
                 clickHandler(item.value);
             });
         }
@@ -93,7 +94,6 @@ function populatePickerWithItems(picker, items, clickHandler) {
         picker.appendChild(menuItem);
     });
 
-    // Don't set initial value - let the label attribute show as placeholder
     console.log(`Picker ${picker.id} populated with ${picker.children.length} items`);
 }
 

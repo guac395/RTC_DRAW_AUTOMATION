@@ -614,49 +614,11 @@ sp-button[variant="cta"][disabled] {
 /* Full width pickers in form groups */
 sp-picker {
     width: 100%;
-    --spectrum-picker-height: 40px;
-    /* Ensure text is visible */
-    --spectrum-picker-text-color: #333;
-    --spectrum-picker-placeholder-text-color: #666;
-    --spectrum-picker-font-size: 14px;
-}
-
-/* Navy hover/focus colors to match brand */
-sp-picker:hover:not([disabled]) {
-    --spectrum-picker-border-color-hover: #001f3f;
-}
-
-sp-picker:focus,
-sp-picker:focus-within {
-    --spectrum-picker-border-color-key-focus: #001f3f;
 }
 
 /* Disabled state styling */
 sp-picker[disabled] {
-    --spectrum-picker-background-color-disabled: #f5f5f5;
-    --spectrum-picker-text-color-disabled: #999;
-    opacity: 1 !important;
-}
-
-/* Menu item text styling */
-sp-menu-item {
-    --spectrum-selectlist-option-text-color: #333;
-    --spectrum-selectlist-option-font-size: 14px;
-}
-
-/* Menu item hover/selection colors with navy */
-sp-menu-item:hover {
-    --spectrum-selectlist-option-background-color-hover: rgba(0, 31, 63, 0.1);
-}
-
-sp-menu-item[selected] {
-    --spectrum-selectlist-option-background-color-selected: rgba(0, 31, 63, 0.15);
-}
-
-/* Style placeholder menu items differently */
-sp-menu-item[value="__placeholder__"] {
-    --spectrum-selectlist-option-text-color: #999;
-    font-style: italic;
+    opacity: 0.5;
 }
 
 /* Adjust main content to accommodate navigation */
