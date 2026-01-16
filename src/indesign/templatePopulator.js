@@ -94,6 +94,10 @@ function populateDocument(bracket, flatMatches) {
         const frameCache = buildFrameCache(doc);
         console.log(`Frame cache built with ${frameCache.size} named frames`);
 
+        // Clear all bracket frames before populating to prevent stale data
+        const clearResult = clearBracketFrames();
+        console.log(`Cleared ${clearResult.clearedCount} bracket frames`);
+
         // Iterate through all matches and populate text frames
         for (let index = 0; index < flatMatches.length; index++) {
             // Check if document is still valid (user might have closed it)
@@ -110,31 +114,57 @@ function populateDocument(bracket, flatMatches) {
             const roundNum = match.roundNumber;
             const matchNum = match.matchNumber;
 
-            // Populate player 1
-            if (match.player1) {
-                const frameNameP1 = `<R${roundNum}_M${matchNum}_P1>`;
-                const player1Result = populateTextFrameCached(frameCache, frameNameP1, match.player1);
-                updateResults(results, player1Result, frameNameP1);
-            }
+            // Check if this is a BYE match (one player is BYE)
+            const isByeMatch = (match.player1 && match.player1.isBye) ||
+                               (match.player2 && match.player2.isBye);
 
-            // Populate player 2
-            if (match.player2) {
-                const frameNameP2 = `<R${roundNum}_M${matchNum}_P2>`;
-                const player2Result = populateTextFrameCached(frameCache, frameNameP2, match.player2);
-                updateResults(results, player2Result, frameNameP2);
-            }
+            if (isByeMatch) {
+                // BYE match: Don't populate Round 1 at all
+                // Instead, populate the non-BYE player directly into Round 2
+                if (match.winner && !match.winner.isBye) {
+                    // Calculate Round 2 frame position
+                    // R1 Match 1-2 → R2 Match 1, R1 Match 3-4 → R2 Match 2, etc.
+                    const r2MatchNum = Math.ceil(matchNum / 2);
+                    // Odd R1 matches go to P1, even R1 matches go to P2
+                    const r2PlayerSlot = matchNum % 2 === 1 ? 'P1' : 'P2';
+                    const r2FrameName = `<R2_M${r2MatchNum}_${r2PlayerSlot}>`;
 
-            // Optionally populate seed frames if they exist
-            if (match.player1 && match.player1.seed) {
-                const seedFrameP1 = `<R${roundNum}_M${matchNum}_P1_SEED>`;
-                const seedResult1 = populateSimpleTextFrameCached(frameCache, seedFrameP1, `(${match.player1.seed})`);
-                if (seedResult1.success) results.populated++;
-            }
+                    const advanceResult = populateTextFrameCached(frameCache, r2FrameName, match.winner);
+                    updateResults(results, advanceResult, r2FrameName);
 
-            if (match.player2 && match.player2.seed) {
-                const seedFrameP2 = `<R${roundNum}_M${matchNum}_P2_SEED>`;
-                const seedResult2 = populateSimpleTextFrameCached(frameCache, seedFrameP2, `(${match.player2.seed})`);
-                if (seedResult2.success) results.populated++;
+                    // Optionally populate seed frame in Round 2
+                    if (match.winner.seed) {
+                        const r2SeedFrame = `<R2_M${r2MatchNum}_${r2PlayerSlot}_SEED>`;
+                        const seedResult = populateSimpleTextFrameCached(frameCache, r2SeedFrame, `(${match.winner.seed})`);
+                        if (seedResult.success) results.populated++;
+                    }
+                }
+            } else {
+                // Real match: Populate both players in Round 1 as normal
+                if (match.player1) {
+                    const frameNameP1 = `<R${roundNum}_M${matchNum}_P1>`;
+                    const player1Result = populateTextFrameCached(frameCache, frameNameP1, match.player1);
+                    updateResults(results, player1Result, frameNameP1);
+                }
+
+                if (match.player2) {
+                    const frameNameP2 = `<R${roundNum}_M${matchNum}_P2>`;
+                    const player2Result = populateTextFrameCached(frameCache, frameNameP2, match.player2);
+                    updateResults(results, player2Result, frameNameP2);
+                }
+
+                // Optionally populate seed frames if they exist
+                if (match.player1 && match.player1.seed) {
+                    const seedFrameP1 = `<R${roundNum}_M${matchNum}_P1_SEED>`;
+                    const seedResult1 = populateSimpleTextFrameCached(frameCache, seedFrameP1, `(${match.player1.seed})`);
+                    if (seedResult1.success) results.populated++;
+                }
+
+                if (match.player2 && match.player2.seed) {
+                    const seedFrameP2 = `<R${roundNum}_M${matchNum}_P2_SEED>`;
+                    const seedResult2 = populateSimpleTextFrameCached(frameCache, seedFrameP2, `(${match.player2.seed})`);
+                    if (seedResult2.success) results.populated++;
+                }
             }
         }
 
@@ -183,8 +213,8 @@ function populateTextFrame(doc, frameName, player) {
         // Format player text based on available data
         let playerText = player.name;
 
-        // Add handicap if available (singles or doubles)
-        const handicap = player.singlesHandicap || player.doublesHandicap;
+        // Add handicap if available (prefer singles for singles events, doubles for doubles)
+        const handicap = player.singlesHandicap ?? player.doublesHandicap;
         if (handicap !== null && handicap !== undefined) {
             playerText += ` (${handicap})`;
         }
@@ -251,8 +281,8 @@ function populateTextFrameCached(frameCache, frameName, player) {
         // Format player text based on available data
         let playerText = player.name;
 
-        // Add handicap if available (singles or doubles)
-        const handicap = player.singlesHandicap || player.doublesHandicap;
+        // Add handicap if available (prefer singles for singles events, doubles for doubles)
+        const handicap = player.singlesHandicap ?? player.doublesHandicap;
         if (handicap !== null && handicap !== undefined) {
             playerText += ` (${handicap})`;
         }

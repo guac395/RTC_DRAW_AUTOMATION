@@ -85,3 +85,7 @@ oauth-tokens/
 *.bak
 *~
 .cache/
+
+# Local config with credentials
+src/config.local.js
+config.local.js

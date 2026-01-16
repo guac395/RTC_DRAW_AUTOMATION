@@ -85,8 +85,13 @@ function populatePickerWithItems(picker, items, clickHandler) {
         if (clickHandler) {
             menuItem.addEventListener('click', () => {
                 console.log(`Menu item clicked: ${item.value} in picker ${picker.id}`);
+                // Clear selected from all siblings
+                picker.querySelectorAll('sp-menu-item').forEach(mi => mi.removeAttribute('selected'));
+                // Mark this item as selected
+                menuItem.setAttribute('selected', '');
                 picker.value = item.value;
-                picker.label = item.text;  // Update displayed label in UXP
+                // Explicitly update picker's displayed label (UXP fix - auto-update doesn't work)
+                picker.label = item.text;
                 clickHandler(item.value);
             });
         }
@@ -822,7 +827,10 @@ function enrichWithHandicap(entry, type) {
 
     const enriched = {
         ...entry,
+        // Set both generic and type-specific handicap properties for validation compatibility
         handicap: player ? (type === 'singles' ? player.singlesHCAP : player.doublesHCAP) : null,
+        singlesHandicap: player ? player.singlesHCAP : null,
+        doublesHandicap: player ? player.doublesHCAP : null,
         handicapFound: !!player
     };
 
@@ -919,9 +927,14 @@ function displayValidationWarnings() {
         }
     }
 
-    // Add validation errors
+    // Add other validation errors (excluding missing handicap which is already shown above)
     if (!appState.validationResult.valid) {
-        warnings.push(`${appState.validationResult.errors.length} validation error(s) found`);
+        const otherErrors = appState.validationResult.errors.filter(e =>
+            !e.errors.some(err => err.includes('Missing handicap'))
+        );
+        if (otherErrors.length > 0) {
+            warnings.push(`${otherErrors.length} other validation error(s) found`);
+        }
     }
 
     if (warnings.length > 0 || !appState.validationResult.valid) {
@@ -940,11 +953,19 @@ function displayValidationWarnings() {
 }
 
 /**
+ * Small delay helper to allow UI updates between steps
+ */
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * Handle generate bracket in InDesign
  */
 async function handleGenerateBracket() {
     try {
-        showLoading('Generating bracket and populating document...');
+        // Step 1: Initial validation
+        showLoading('Validating event selection...');
 
         if (!appState.selectedEventTab) {
             showError('No event selected');
@@ -958,7 +979,10 @@ async function handleGenerateBracket() {
             showInfo(`Warning: ${appState.validationResult.errors.length} validation errors found`);
         }
 
-        // Prepare participants for seeding
+        // Step 2: Prepare participants
+        showLoading('Preparing participants...');
+        await delay(100);
+
         const participants = appState.currentParticipants.map(p => ({
             name: p.playerName + (p.partnerName ? ` & ${p.partnerName}` : ''),
             singlesHandicap: p.eventType === 'singles' ? p.handicap : null,
@@ -976,6 +1000,10 @@ async function handleGenerateBracket() {
         // Determine bracket size - calculate next power of 2
         const bracketSize = Math.pow(2, Math.ceil(Math.log2(participants.length)));
 
+        // Step 3: Organize participants by availability
+        showLoading('Organizing participants by availability...');
+        await delay(100);
+
         // Place participants by availability (Day in top half, Night in bottom half, random within)
         const placementResult = seedParticipants(participants, bracketSize);
 
@@ -990,7 +1018,10 @@ async function handleGenerateBracket() {
             console.log('Bracket placement stats:', placementResult.stats);
         }
 
-        // Generate bracket
+        // Step 4: Generate bracket structure
+        showLoading('Generating bracket structure...');
+        await delay(100);
+
         const bracketResult = generateBracket(placementResult.seeded, bracketSize);
 
         if (!bracketResult.success) {
@@ -1001,7 +1032,10 @@ async function handleGenerateBracket() {
 
         appState.currentBracket = bracketResult.bracket;
 
-        // Validate bracket structure
+        // Step 5: Validate bracket
+        showLoading('Validating bracket...');
+        await delay(100);
+
         const bracketValidation = validateBracket(appState.currentBracket);
         if (!bracketValidation.valid) {
             console.warn('Bracket validation warnings:', bracketValidation.errors);
@@ -1026,7 +1060,10 @@ async function handleGenerateBracket() {
             }
         }
 
-        // Populate the InDesign document
+        // Step 6: Populate InDesign document
+        showLoading('Populating InDesign document...');
+        await delay(100);
+
         const result = populateDocument(appState.currentBracket, flatMatches);
 
         hideLoading();

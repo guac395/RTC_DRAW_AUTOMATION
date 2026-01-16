@@ -1,13 +1,21 @@
 /**
  * Configuration file for R&TC Tournament Matcher
- * Credentials are loaded from environment variables for security
+ *
+ * For local development, create config.local.js with your credentials.
  */
 
-const CONFIG = {
-    // Google OAuth Credentials - loaded from .env file
-    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
-    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || ''
-};
+// Try to load local config first (gitignored)
+let CONFIG;
+try {
+    const localConfig = require('./config.local.js');
+    CONFIG = localConfig.CONFIG;
+} catch (e) {
+    // Fallback to empty defaults if no local config
+    CONFIG = {
+        GOOGLE_CLIENT_ID: '',
+        GOOGLE_CLIENT_SECRET: ''
+    };
+}
 
 // Export for CommonJS (UXP)
 module.exports = { CONFIG };

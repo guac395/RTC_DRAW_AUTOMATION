@@ -295,11 +295,14 @@ body {
     font-size: 14px;
 }
 
-/* Footer Messages */
+/* Footer Messages - Fixed position toast notifications */
 .panel-footer {
-    padding: 12px 20px;
-    background: white;
-    border-top: 1px solid #e0e0e0;
+    position: fixed;
+    bottom: 70px; /* Above the nav buttons */
+    left: 20px;
+    right: 20px;
+    z-index: 100;
+    pointer-events: none; /* Allow clicks to pass through when empty */
 }
 
 .error-message,
@@ -308,6 +311,8 @@ body {
     border-radius: 4px;
     font-size: 13px;
     margin-bottom: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    pointer-events: auto; /* Make messages clickable */
 }
 
 .error-message {
@@ -358,7 +363,8 @@ body {
 /* All main action buttons - navy normal state, dark grey disabled */
 #btn-connect,
 #btn-submit-auth,
-#btn-load-entries {
+#btn-load-entries,
+#btn-generate {
     --spectrum-button-primary-background-color-default: #001f3f !important;
     --spectrum-button-primary-background-color: #001f3f !important;
     --spectrum-button-cta-background-color-default: #001f3f !important;
@@ -369,7 +375,8 @@ body {
 
 #btn-connect:hover:not(:disabled),
 #btn-submit-auth:hover:not(:disabled),
-#btn-load-entries:hover:not(:disabled) {
+#btn-load-entries:hover:not(:disabled),
+#btn-generate:hover:not(:disabled) {
     --spectrum-button-primary-background-color-default: #001528 !important;
     --spectrum-button-primary-background-color: #001528 !important;
     --spectrum-button-cta-background-color-default: #001528 !important;
@@ -380,7 +387,8 @@ body {
 
 #btn-connect[disabled],
 #btn-submit-auth[disabled],
-#btn-load-entries[disabled] {
+#btn-load-entries[disabled],
+#btn-generate[disabled] {
     --spectrum-button-primary-background-color-default: #d0d0d0 !important;
     --spectrum-button-primary-background-color: #d0d0d0 !important;
     --spectrum-button-cta-background-color-default: #d0d0d0 !important;
