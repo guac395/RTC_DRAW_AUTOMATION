@@ -5,6 +5,8 @@
  */
 
 const { app } = require('indesign');
+const { calculateTeamHandicap } = require('../matchmaking/teamHandicap');
+const { processHandicapForDisplay } = require('../matchmaking/handicapRounding');
 
 /**
  * Builds a cache of all named text frames in the document for fast lookup.
@@ -69,9 +71,10 @@ function isDocumentValid() {
  *
  * @param {Object} bracket - Complete bracket structure from pairingEngine
  * @param {Array} flatMatches - Flattened match list from getFlatMatchList()
+ * @param {Object} eventContext - Event context with eventName, eventType, isDoubles
  * @returns {Object} Result with success status and details
  */
-function populateDocument(bracket, flatMatches) {
+function populateDocument(bracket, flatMatches, eventContext = {}) {
     try {
         // Validate InDesign is available
         if (!isDocumentValid()) {
@@ -129,7 +132,7 @@ function populateDocument(bracket, flatMatches) {
                     const r2PlayerSlot = matchNum % 2 === 1 ? 'P1' : 'P2';
                     const r2FrameName = `<R2_M${r2MatchNum}_${r2PlayerSlot}>`;
 
-                    const advanceResult = populateTextFrameCached(frameCache, r2FrameName, match.winner);
+                    const advanceResult = populateTextFrameCached(frameCache, r2FrameName, match.winner, eventContext);
                     updateResults(results, advanceResult, r2FrameName);
 
                     // Optionally populate seed frame in Round 2
@@ -143,13 +146,13 @@ function populateDocument(bracket, flatMatches) {
                 // Real match: Populate both players in Round 1 as normal
                 if (match.player1) {
                     const frameNameP1 = `<R${roundNum}_M${matchNum}_P1>`;
-                    const player1Result = populateTextFrameCached(frameCache, frameNameP1, match.player1);
+                    const player1Result = populateTextFrameCached(frameCache, frameNameP1, match.player1, eventContext);
                     updateResults(results, player1Result, frameNameP1);
                 }
 
                 if (match.player2) {
                     const frameNameP2 = `<R${roundNum}_M${matchNum}_P2>`;
-                    const player2Result = populateTextFrameCached(frameCache, frameNameP2, match.player2);
+                    const player2Result = populateTextFrameCached(frameCache, frameNameP2, match.player2, eventContext);
                     updateResults(results, player2Result, frameNameP2);
                 }
 
@@ -262,9 +265,10 @@ function populateSimpleTextFrame(doc, frameName, text) {
  * @param {Map} frameCache - Cached map of frame names to frame objects
  * @param {string} frameName - Name of the text frame to populate
  * @param {Object} player - Player object with name, seed, handicap
+ * @param {Object} eventContext - Event context with eventName, eventType, isDoubles
  * @returns {Object} Result with success status
  */
-function populateTextFrameCached(frameCache, frameName, player) {
+function populateTextFrameCached(frameCache, frameName, player, eventContext = {}) {
     try {
         // Skip BYE players
         if (player.isBye) {
@@ -280,11 +284,43 @@ function populateTextFrameCached(frameCache, frameName, player) {
 
         // Format player text based on available data
         let playerText = player.name;
+        const eventName = eventContext.eventName || '';
+        const isDoubles = eventContext.isDoubles || false;
 
-        // Add handicap if available (prefer singles for singles events, doubles for doubles)
-        const handicap = player.singlesHandicap ?? player.doublesHandicap;
-        if (handicap !== null && handicap !== undefined) {
-            playerText += ` (${handicap})`;
+        // Calculate and format handicap based on event type
+        let displayHandicap = '';
+
+        if (isDoubles && player.rawEntry) {
+            // Doubles: Calculate team handicap using IRTPA algorithm
+            // rawEntry should have player and partner handicap info
+            const entry = player.rawEntry;
+            const playerHandicap = entry.singlesHCAP ?? entry.singlesHandicap ?? entry.handicap;
+            const partnerHandicap = entry.partnerSinglesHCAP ?? entry.partnerSinglesHandicap ?? entry.partnerHandicap;
+
+            if (playerHandicap !== null && playerHandicap !== undefined &&
+                partnerHandicap !== null && partnerHandicap !== undefined) {
+                const teamResult = calculateTeamHandicap(
+                    { singlesHandicap: playerHandicap },
+                    { singlesHandicap: partnerHandicap }
+                );
+                if (teamResult.success) {
+                    displayHandicap = processHandicapForDisplay(teamResult.teamHandicap, eventName);
+                }
+            } else if (playerHandicap !== null && playerHandicap !== undefined) {
+                // Fallback: use player's handicap if partner info unavailable
+                displayHandicap = processHandicapForDisplay(playerHandicap, eventName);
+            }
+        } else {
+            // Singles: Use singles handicap with rounding
+            const handicap = player.singlesHandicap ?? player.doublesHandicap;
+            if (handicap !== null && handicap !== undefined) {
+                displayHandicap = processHandicapForDisplay(handicap, eventName);
+            }
+        }
+
+        // Add handicap to player text if available
+        if (displayHandicap !== '') {
+            playerText += ` (${displayHandicap})`;
         }
 
         // Set the text content

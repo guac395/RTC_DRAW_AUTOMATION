@@ -1064,7 +1064,13 @@ async function handleGenerateBracket() {
         showLoading('Populating InDesign document...');
         await delay(100);
 
-        const result = populateDocument(appState.currentBracket, flatMatches);
+        // Build event context for handicap rounding
+        const eventContext = {
+            eventName: appState.selectedEventTab,
+            eventType: appState.currentParticipants[0]?.eventType || 'singles',
+            isDoubles: appState.selectedEventTab.toLowerCase().includes('doubles')
+        };
+        const result = populateDocument(appState.currentBracket, flatMatches, eventContext);
 
         hideLoading();
 
